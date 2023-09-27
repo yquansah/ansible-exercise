@@ -7,9 +7,18 @@ app = Flask(__name__)
 
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+def create_db_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="user",
+        password="password",
+        database="mysql",
+        port=3306,
+    )
+
 @app.route("/names")
 def names():
-    connection = mysql.connector.connect(host="localhost", user="mysql", password="password",  port=3306, database="mysql")
+    connection = create_db_connection()
 
     cur = connection.cursor()
 
@@ -32,7 +41,7 @@ def names():
 
 @app.route("/names/<name>", methods=["PUT"])
 def add_name(name):
-    connection = mysql.connector.connect(host="localhost", user="mysql", password="password",  port=3306, database="mysql")
+    connection = create_db_connection()
 
     cur = connection.cursor()
 
@@ -54,7 +63,7 @@ def add_name(name):
 
 
 if __name__ == "__main__":
-    connection = mysql.connector.connect(host="localhost", user="mysql", password="password",  port=3306, database="mysql")
+    connection = create_db_connection()
 
     cur = connection.cursor()
     with open("names.sql") as f:
