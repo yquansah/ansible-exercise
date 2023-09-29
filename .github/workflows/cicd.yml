@@ -49,7 +49,7 @@ jobs:
         shell: bash
         run: |
           service ssh status
-          cd ansible-exercise
+          sudo apt install ansible --yes
           ansible-playbook -i inventory -l database final-playbook.yml
           ansible-playbook -i inventory -l backend final-playbook.yml
           ansible-playbook -i inventory -l frontend final-playbook.yml
