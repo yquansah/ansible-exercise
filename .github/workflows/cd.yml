@@ -1,36 +1,14 @@
-name: CI
+name: CD
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
     branches:
-      - main
-  pull_request:
-  workflow_dispatch:
+      - "master"
 
 jobs:
-  ci-python-test:
-    name: "Test CI Python app"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Install Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "pypy3.9"
-
-      - name: Install Python dependencies
-        run: |
-          cd ./app/python
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run unittest on code
-        run: |
-          cd ./app/python
-          python -m unittest test_main.py
-
   cd-python-deployment:
-    needs: ci-python-test
     name: "Deploy Three Tier Application"
     runs-on: ubuntu-latest
     steps:
@@ -44,7 +22,6 @@ jobs:
           touch /home/runner/.ssh/privkey.pem
           echo -e "${{secrets.SSH_KEY}}" > /home/runner/.ssh/privkey.pem
           chmod 400 /home/runner/.ssh/privkey.pem
-          ssh-keyscan -t rsa,dsa,ecdsa,ed25519 ${{secrets.SSH_HOST}} >> /home/runner/.ssh/known_hosts
       - name: Run Ansible playbook
         shell: bash
         run: |
