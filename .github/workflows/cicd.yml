@@ -1,0 +1,56 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  ci-python-test:
+    name: "Test CI Python app"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directoru: ./app/python
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "pypy3.9"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run unittest on code
+        run: |
+          python -m unittest test_main.py
+
+  cd-python-deployment:
+    needs: ci-python-test
+    name: "Deploy Three Tier Application"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup SSH
+        shell: bash
+        run: |
+          eval `ssh-agent -s`
+          mkdir -p /home/runner/.ssh
+          touch /home/runner/.ssh/privkey.pem
+          echo -e "${{secrets.SSH_KEY}}" > /home/runner/.ssh/privkey.pem
+          chmod 400 /home/runner/.ssh/privkey.pem
+          ssh-keyscan -t rsa,dsa,ecdsa,ed25519 ${{secrets.SSH_HOST}} >> /home/runner/.ssh/known_hosts
+      - name: Run Ansible playbook
+        shell: bash
+        run: |
+          service ssh status
+          cd ansible-exercise
+          ansible-playbook -i inventory -l database final-playbook.yml
+          ansible-playbook -i inventory -l backend final-playbook.yml
+          ansible-playbook -i inventory -l frontend final-playbook.yml
