@@ -9,8 +9,8 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 def create_db_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="user",
+        host="3.144.186.45",
+        user="mysql",
         password="password",
         database="mysql",
         port=3306,
