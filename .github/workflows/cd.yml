@@ -1,14 +1,12 @@
 name: CD
 on:
   workflow_run:
-    workflows: ["CI"]
+    workflows: [CI]
     types:
       - completed
-    branches:
-      - "master"
 
 jobs:
-  cd-python-deployment:
+  cd-three-tier-deployment:
     name: "Deploy Three Tier Application"
     runs-on: ubuntu-latest
     steps:
