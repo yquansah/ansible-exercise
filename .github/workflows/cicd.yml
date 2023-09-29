@@ -10,9 +10,6 @@ jobs:
   ci-python-test:
     name: "Test CI Python app"
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directoru: ./app/python
     steps:
       - uses: actions/checkout@v3
 
@@ -23,11 +20,13 @@ jobs:
 
       - name: Install Python dependencies
         run: |
+          cd ./app/python
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Run unittest on code
         run: |
+          cd ./app/python
           python -m unittest test_main.py
 
   cd-python-deployment:
