@@ -1,14 +1,38 @@
-name: CD
+name: CI/CD
 on:
-  workflow_run:
-    workflows: [CI]
-    types:
-      - completed
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
 
 jobs:
-  cd-three-tier-deployment:
+  ci-python-test:
+    name: "Test CI Python app"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "pypy3.9"
+
+      - name: Install Python dependencies
+        run: |
+          cd ./app/python
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run unittest on code
+        run: |
+          cd ./app/python
+          python -m unittest test_main.py
+
+  cd-python-deployment:
     name: "Deploy Three Tier Application"
     runs-on: ubuntu-latest
+    if: contains('refs/heads/master', github.ref)
     steps:
       - uses: actions/checkout@v3
       
