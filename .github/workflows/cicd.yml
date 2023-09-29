@@ -33,6 +33,7 @@ jobs:
     name: "Deploy Three Tier Application"
     runs-on: ubuntu-latest
     if: contains('refs/heads/master', github.ref)
+    needs: ci-python-test
     steps:
       - uses: actions/checkout@v3
       
